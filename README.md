@@ -82,6 +82,9 @@ A modern, modular Neovim configuration with transparent UI, LSP support, and opt
 - `[d` / `]d` - Previous/next diagnostic
 - `<leader>lf` - Format file
 
+### Toggles
+- `<leader>td` - Toggle diagnostics virtual text
+
 ### Code Runner
 - `<leader>rr` - Run code
 - `<leader>rf` - Run file

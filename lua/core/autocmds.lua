@@ -2,29 +2,31 @@
 
 local autocmd = vim.api.nvim_create_autocmd
 
+-- Store diagnostic virtual text formatter for toggling
+_G.diagnostic_virtual_text_format = function(diagnostic)
+  -- Hide "declared but never read/used" messages
+  local dominated_patterns = {
+    "never read",
+    "never used",
+    "is declared but",
+    "is defined but never used",
+    "is assigned a value but never used",
+    "unused",
+  }
+  local msg = diagnostic.message:lower()
+  for _, pattern in ipairs(dominated_patterns) do
+    if msg:find(pattern) then
+      return nil
+    end
+  end
+  return diagnostic.message
+end
+
 -- Disable all underlines in diagnostics
 vim.diagnostic.config({
   underline = false,
   virtual_text = {
-    -- Filter out "unused" diagnostics
-    format = function(diagnostic)
-      -- Hide "declared but never read/used" messages
-      local dominated_patterns = {
-        "never read",
-        "never used",
-        "is declared but",
-        "is defined but never used",
-        "is assigned a value but never used",
-        "unused",
-      }
-      local msg = diagnostic.message:lower()
-      for _, pattern in ipairs(dominated_patterns) do
-        if msg:find(pattern) then
-          return nil
-        end
-      end
-      return diagnostic.message
-    end,
+    format = _G.diagnostic_virtual_text_format,
   },
   signs = false,
 })

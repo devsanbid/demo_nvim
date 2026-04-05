@@ -28,3 +28,23 @@ end, { desc = "Format file" })
 
 -- Search word under cursor
 keymap("n", "<C-n>", "*N", { desc = "Select word under cursor for search" })
+
+-- Toggle diagnostics virtual text
+keymap("n", "<leader>td", function()
+  local current_config = vim.diagnostic.config()
+  local virtual_text_enabled = current_config.virtual_text ~= false
+  
+  if virtual_text_enabled then
+    -- Disable virtual text
+    vim.diagnostic.config({ virtual_text = false })
+    vim.notify("Diagnostics virtual text disabled", vim.log.levels.INFO)
+  else
+    -- Enable virtual text with the custom formatter
+    vim.diagnostic.config({
+      virtual_text = {
+        format = _G.diagnostic_virtual_text_format,
+      }
+    })
+    vim.notify("Diagnostics virtual text enabled", vim.log.levels.INFO)
+  end
+end, { desc = "Toggle diagnostics virtual text" })
