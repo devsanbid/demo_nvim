@@ -22,12 +22,42 @@ _G.diagnostic_virtual_text_format = function(diagnostic)
   return diagnostic.message
 end
 
--- Disable all underlines in diagnostics
+-- Persistent state management for diagnostics
+local state_file = vim.fn.stdpath("data") .. "/diagnostics_state.json"
+
+-- Load diagnostics state from file
+local function load_diagnostics_state()
+  local file = io.open(state_file, "r")
+  if file then
+    local content = file:read("*all")
+    file:close()
+    local ok, state = pcall(vim.json.decode, content)
+    if ok and state then
+      return state
+    end
+  end
+  -- Default state: virtual text enabled
+  return { virtual_text_enabled = true }
+end
+
+-- Save diagnostics state to file
+_G.save_diagnostics_state = function(state)
+  local file = io.open(state_file, "w")
+  if file then
+    file:write(vim.json.encode(state))
+    file:close()
+  end
+end
+
+-- Load and apply saved state
+local saved_state = load_diagnostics_state()
+
+-- Configure diagnostics based on saved state
 vim.diagnostic.config({
   underline = false,
-  virtual_text = {
+  virtual_text = saved_state.virtual_text_enabled and {
     format = _G.diagnostic_virtual_text_format,
-  },
+  } or false,
   signs = false,
 })
 

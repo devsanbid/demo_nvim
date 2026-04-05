@@ -37,6 +37,7 @@ keymap("n", "<leader>td", function()
   if virtual_text_enabled then
     -- Disable virtual text
     vim.diagnostic.config({ virtual_text = false })
+    _G.save_diagnostics_state({ virtual_text_enabled = false })
     vim.notify("Diagnostics virtual text disabled", vim.log.levels.INFO)
   else
     -- Enable virtual text with the custom formatter
@@ -45,6 +46,7 @@ keymap("n", "<leader>td", function()
         format = _G.diagnostic_virtual_text_format,
       }
     })
+    _G.save_diagnostics_state({ virtual_text_enabled = true })
     vim.notify("Diagnostics virtual text enabled", vim.log.levels.INFO)
   end
 end, { desc = "Toggle diagnostics virtual text" })
