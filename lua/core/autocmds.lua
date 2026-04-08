@@ -77,6 +77,47 @@ autocmd("LspAttach", {
   end,
 })
 
+-- Open neo-tree when opening a directory
+autocmd("VimEnter", {
+  callback = function(args)
+    local is_dir = vim.fn.isdirectory(args.file) == 1
+    if is_dir then
+      -- Create an empty buffer first to prevent Neovim from closing
+      vim.cmd("enew")
+      -- Delete the directory buffer
+      local dir_bufnr = vim.fn.bufnr(args.file)
+      if dir_bufnr ~= -1 and vim.api.nvim_buf_is_valid(dir_bufnr) then
+        pcall(vim.api.nvim_buf_delete, dir_bufnr, { force = true })
+      end
+      -- Load neo-tree plugin if not already loaded
+      require("lazy").load({ plugins = { "neo-tree.nvim" } })
+      -- Open neo-tree
+      vim.cmd("Neotree")
+    end
+  end,
+  desc = "Open neo-tree when opening a directory",
+})
+
+-- Also handle when opening a directory after Vim has started
+autocmd("BufEnter", {
+  callback = function(args)
+    local is_dir = vim.fn.isdirectory(args.file) == 1
+    if is_dir then
+      -- Create an empty buffer first to prevent Neovim from closing
+      vim.cmd("enew")
+      -- Delete the directory buffer
+      if vim.api.nvim_buf_is_valid(args.buf) then
+        pcall(vim.api.nvim_buf_delete, args.buf, { force = true })
+      end
+      -- Load neo-tree plugin if not already loaded
+      require("lazy").load({ plugins = { "neo-tree.nvim" } })
+      -- Open neo-tree
+      vim.cmd("Neotree")
+    end
+  end,
+  desc = "Open neo-tree when entering a directory buffer",
+})
+
 -- Flutter auto hot reload on save
 autocmd("BufWritePost", {
   pattern = "*.dart",

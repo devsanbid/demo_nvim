@@ -112,6 +112,26 @@ return {
         tab_size = 15,
         max_name_length = 20,
         truncate_names = true,
+        -- Filter out directory buffers and other unwanted buffers
+        custom_filter = function(buf_number)
+          local buf_name = vim.api.nvim_buf_get_name(buf_number)
+          local buf_ft = vim.api.nvim_get_option_value("filetype", { buf = buf_number })
+          
+          -- Filter out directory buffers
+          if vim.fn.isdirectory(buf_name) == 1 then
+            return false
+          end
+          
+          -- Filter out neo-tree and other special filetypes
+          local excluded_fts = { "neo-tree", "netrw" }
+          for _, ft in ipairs(excluded_fts) do
+            if buf_ft == ft then
+              return false
+            end
+          end
+          
+          return true
+        end,
       },
       highlights = {
         fill = { bg = "none" },
